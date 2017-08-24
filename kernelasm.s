@@ -1,4 +1,11 @@
-	ldr r1,=0xbeef
-	ldr r2,=0xdead
-forever:
-	b forever
+//tOS Kernel Module
+
+	ldr sp,=stack
+	b kernel_main
+
+.section .data
+
+.rept 1024
+	.word 0
+.endr
+stack:

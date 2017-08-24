@@ -4,12 +4,6 @@ LD=arm-none-eabi-ld
 OBJCOPY=arm-none-eabi-objcopy
 QEMU=qemu-system-arm
 
-
-# CC=/usr/arm-linux-gnu-gcc
-# LD=arm-linux-gnu-ld
-# OBJCOPY=arm-linux-gnu-objcopy
-
-
 AS=$(CC)
 
 CC+= -Wall -c -mcpu=arm926ej-s -marm -Werror
@@ -23,10 +17,12 @@ export SDL_STDIO_REDIRECT
 
 all: 
 	$(AS) kernelasm.s
-	$(LD) -o kernel.tmp kernelasm.o
+	$(CC) kernelmain.c
+	$(CC) console.c
+	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	"$(QEMU)" $(QEMUARGS) kernel.bin
 	
 	
 clean:
-	-/bin/rm *.o *.exe *.bin *.img *.tmp
+	-/bin/rm *.o *.exe *.bin *.img *.tmp kernelmap.txt
