@@ -13,4 +13,6 @@
 
 void console_init();
 
-void set_pixel(int x, int y);
+void set_pixel(int x, int y, unsigned int color);
+
+void draw_block(int centerX, int centerY, int size, unsigned int color);

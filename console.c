@@ -11,8 +11,21 @@ void console_init()
 	baseaddr1 = (unsigned)framebuffer;
 }
 
-void set_pixel(int x, int y)
+void set_pixel(int x, int y, unsigned int color)
 {
-	framebuffer[WIDTH * 2 * y + 2 * x] = 0x0f;
-	framebuffer[WIDTH * 2 * y + 2 * x + 1] = 0x00;
+	framebuffer[WIDTH * 2 * y + 2 * x] = (unsigned char)(color >> 4);
+	framebuffer[WIDTH * 2 * y + 2 * x + 1] = (unsigned char)(color & 0xf);
+}
+
+void draw_block(int centerX, int centerY, int size, unsigned int color)
+{
+	int i;
+	int j;
+	for (i = 0; i < size; i++)
+	{
+		for (j = 0; j < size; j++)
+		{
+			set_pixel(centerX + i - (size / 2), centerY + j - (size / 2), color);
+		}
+	}
 }
