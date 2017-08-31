@@ -12,15 +12,11 @@ void kernel_main()
 {
 	console_init();
 
-	unsigned int color_first = 0xFF;
-	unsigned int color_second = 0x07;
+	char * string = "Taylor Driggs";
+	draw_string(400, 300, 13, string);
 
-	while(1)
-	{
-		wait(1000000);
-		color_first++;
-		color_second++;
-		draw_initials(400, 300, 10, color_first, color_second);
+	while(1) {
+
 	}
 }
 

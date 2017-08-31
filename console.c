@@ -1,4 +1,5 @@
 #include "console.h"
+#include "font.h"
 
 volatile unsigned char* framebuffer = (unsigned char*)((0x07ffffff - WIDTH * HEIGHT * 2) & 0xfffffff0);
 
@@ -30,39 +31,22 @@ void draw_block(int centerX, int centerY, int size, unsigned int color_first, un
 	}
 }
 
-void draw_initials(int startX, int startY, int size, unsigned int color_first, unsigned int color_second) {
-	// T
-	draw_block(startX, startY, size, color_first, color_second);
-	draw_block(startX, startY + size, size, color_first, color_second);
-	draw_block(startX - size * 3, startY - size, size, color_first, color_second);
-	draw_block(startX - size * 2, startY - size, size, color_first, color_second);
-	draw_block(startX - size, startY - size, size, color_first, color_second);
-	draw_block(startX, startY - size, size, color_first, color_second);
-	draw_block(startX + size, startY - size, size, color_first, color_second);
-	draw_block(startX + size * 2, startY - size, size, color_first, color_second);
-	draw_block(startX + size * 3, startY - size, size, color_first, color_second);
-	draw_block(startX, startY + size * 2, size, color_first, color_second);
-	draw_block(startX, startY + size * 3, size, color_first, color_second);
-	draw_block(startX, startY + size * 4, size, color_first, color_second);
-	draw_block(startX, startY + size * 5, size, color_first, color_second);
+void draw_char(int x, int y, unsigned char c) {
+	int i;
+	int j;
+	for (i = 0; i < CHAR_WIDTH; i++) {
+		for (j = 0; j < CHAR_HEIGHT; j++) {
+			int pixel_on = (font_data[c][i] >> j) & 1;
+			if (pixel_on) {
+				set_pixel(CHAR_WIDTH - j + x, i + y, 0x1f, 0x00);
+			}
+		}
+	}
+}
 
-	// D
-	draw_block(startX + size * 5, startY - size, size, color_first, color_second);
-	draw_block(startX + size * 5, startY, size, color_first, color_second);
-	draw_block(startX + size * 5, startY + size, size, color_first, color_second);
-	draw_block(startX + size * 5, startY + size * 2, size, color_first, color_second);
-	draw_block(startX + size * 5, startY + size * 3, size, color_first, color_second);
-	draw_block(startX + size * 5, startY + size * 4, size, color_first, color_second);
-	draw_block(startX + size * 5, startY + size * 5, size, color_first, color_second);
-	draw_block(startX + size * 6, startY + size * 5, size, color_first, color_second);
-	draw_block(startX + size * 7, startY + size * 5, size, color_first, color_second);
-	draw_block(startX + size * 8, startY + size * 5, size, color_first, color_second);
-	draw_block(startX + size * 6, startY - size, size, color_first, color_second);
-	draw_block(startX + size * 7, startY - size, size, color_first, color_second);
-	draw_block(startX + size * 8, startY - size, size, color_first, color_second);
-	draw_block(startX + size * 9, startY, size, color_first, color_second);
-	draw_block(startX + size * 9, startY + size, size, color_first, color_second);
-	draw_block(startX + size * 9, startY + size * 2, size, color_first, color_second);
-	draw_block(startX + size * 9, startY + size * 3, size, color_first, color_second);
-	draw_block(startX + size * 9, startY + size * 4, size, color_first, color_second);
+void draw_string(int x, int y, int num_chars, const char * c) {
+	int i;
+	for (i = 0; i < num_chars; i++) {
+		draw_char(x + (CHAR_WIDTH * i), y, c[i]);
+	}
 }
