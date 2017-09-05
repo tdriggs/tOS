@@ -13,10 +13,12 @@
 
 void console_init();
 
-void set_pixel(int x, int y, unsigned int color_first, unsigned int color_second);
+void set_pixel(int x, int y, unsigned int r, unsigned int g, unsigned int b);
 
-void draw_block(int centerX, int centerY, int size, unsigned int color_first, unsigned int color_second);
+void draw_block(int x, int y, int width, int height, unsigned int r, unsigned int g, unsigned int b);
 
-void draw_char(int x, int y, unsigned char c);
+void draw_char(int x, int y, unsigned char c, unsigned int r, unsigned int g, unsigned int b);
 
-void draw_string(int x, int y, int num_chars, const char * c);
+void draw_string(int x, int y, const char * c, unsigned int r, unsigned int g, unsigned int b);
+
+void console_putc(unsigned char c);

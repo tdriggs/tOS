@@ -19,7 +19,8 @@ all:
 	$(AS) kernelasm.s
 	$(CC) kernelmain.c
 	$(CC) console.c
-	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o
+	$(CC) testsuite.c
+	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o testsuite.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	"$(QEMU)" $(QEMUARGS) kernel.bin
 	
