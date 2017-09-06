@@ -5,6 +5,8 @@ volatile unsigned char* framebuffer = (unsigned char*)((0x07ffffff - WIDTH * HEI
 
 int row = 0;
 int column = 0;
+unsigned char prev_char = '\0';
+int backspace_pressed = 0;
 
 
 void console_init() {
@@ -71,10 +73,12 @@ void console_putc(unsigned char c) {
 				break;
 			}
 		}
+		backspace_pressed = 0;
 	}
 	else if (c == '\n') {
 		++column;
 		row = 0;
+		backspace_pressed = 0;
 	}
 	else if (c == '\x7f') {
 		--row;
@@ -83,9 +87,11 @@ void console_putc(unsigned char c) {
 			row = (int)(WIDTH / CHAR_WIDTH) - 1;
 		}
 		draw_block(row * CHAR_WIDTH, column * CHAR_HEIGHT, CHAR_WIDTH, CHAR_HEIGHT, 0, 0, 0);
+		backspace_pressed = 0;
 	}
 	else if (c == '\r') {
 		row = 0;
+		backspace_pressed = 0;
 	}
 	else if (c == '\b') {
 		--row;
@@ -93,19 +99,28 @@ void console_putc(unsigned char c) {
 			--column;
 			row = (int)(WIDTH / CHAR_WIDTH);
 		}
+		backspace_pressed = 1;
 	}
 	else if (c == '\f') {
 		row = 0;
 		column = 0;
 		draw_block(0, 0, WIDTH, HEIGHT, 0, 0, 0);
+		backspace_pressed = 0;
 	}
 	else {
-		draw_block(row * CHAR_WIDTH, column * CHAR_HEIGHT, CHAR_WIDTH, CHAR_HEIGHT, 0, 0, 0);
-		draw_char(row * CHAR_WIDTH, column * CHAR_HEIGHT, c, 255, 255, 255);
+		if (backspace_pressed && c == prev_char) {
+			draw_char(row * CHAR_WIDTH + 1, column * CHAR_HEIGHT, c, 255, 255, 255);
+		}
+		else {
+			draw_block(row * CHAR_WIDTH, column * CHAR_HEIGHT, CHAR_WIDTH, CHAR_HEIGHT, 0, 0, 0);
+			draw_char(row * CHAR_WIDTH, column * CHAR_HEIGHT, c, 255, 255, 255);
+		}
+		prev_char = c;
 		++row;
 		if (row >= WIDTH / CHAR_WIDTH) {
 			++column;
 			row = 0;
 		}
+		backspace_pressed = 0;
 	}	
 }
