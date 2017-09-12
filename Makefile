@@ -1,4 +1,3 @@
-
 CC=arm-none-eabi-gcc
 LD=arm-none-eabi-ld
 OBJCOPY=arm-none-eabi-objcopy
@@ -18,9 +17,11 @@ export SDL_STDIO_REDIRECT
 all: 
 	$(AS) kernelasm.s
 	$(CC) kernelmain.c
-	$(CC) console.c
-	$(CC) testsuite.c
-	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o testsuite.o
+	$(CC) console.c 
+	$(CC) testsuite.c 
+	$(CC) kprintf.c
+	$(CC) util.c
+	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o testsuite.o kprintf.o util.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	"$(QEMU)" $(QEMUARGS) kernel.bin
 	

@@ -1,12 +1,13 @@
 #include "console.h"
 #include "font.h"
+#include "util.h"
 
-volatile unsigned char* framebuffer = (unsigned char*)((0x07ffffff - WIDTH * HEIGHT * 2) & 0xfffffff0);
+volatile unsigned char * framebuffer = (unsigned char *)((0x07ffffff - WIDTH * HEIGHT * 2) & 0xfffffff0);
+volatile unsigned * serialport = (unsigned *) 0x16000000;
+volatile unsigned * serialflags = (unsigned *) 0x16000018;
 
-int row = 0;
-int column = 0;
-unsigned char prev_char = '\0';
-int backspace_pressed = 0;
+const int BYTES_IN_LINE = WIDTH * CHAR_HEIGHT * 2;
+const int BYTES_ON_SCREEN = WIDTH * HEIGHT * 2;
 
 
 void console_init() {
@@ -32,7 +33,6 @@ void set_pixel(int x, int y, unsigned int r, unsigned int g, unsigned int b) {
 }
 
 void draw_block(int x, int y, int width, int height, unsigned int r, unsigned int g, unsigned int b) {
-
 	for (int i = 0; i < width; ++i) {
 		for (int j = 0; j < height; ++j) {
 			set_pixel(x + i, y + j, r, g, b);
@@ -60,6 +60,11 @@ void draw_string(int x, int y, const char * c, unsigned int r, unsigned int g, u
 }
 
 void console_putc(unsigned char c) {
+	static int row = 0;
+	static int column = 0;
+	static unsigned char prev_char = '\0';
+	static int backspace_pressed = 0;
+
 	if (c == '\t') {
 		while (1) {
 			++row;
@@ -67,6 +72,11 @@ void console_putc(unsigned char c) {
 			if (row >= WIDTH / CHAR_WIDTH) {
 				++column;
 				row = 0;
+
+				if (column >= (HEIGHT / CHAR_HEIGHT) - 1) {
+					kmemcpy((void *)framebuffer, (void *)(framebuffer + BYTES_IN_LINE), BYTES_ON_SCREEN - BYTES_IN_LINE);
+					--column;
+				}
 			}
 
 			if (row % 8 == 0) {
@@ -78,6 +88,11 @@ void console_putc(unsigned char c) {
 	else if (c == '\n') {
 		++column;
 		row = 0;
+
+		if (column >= (HEIGHT / CHAR_HEIGHT) - 1) {
+			kmemcpy((void *)framebuffer, (void *)(framebuffer + BYTES_IN_LINE), BYTES_ON_SCREEN - BYTES_IN_LINE);
+			--column;
+		}
 		backspace_pressed = 0;
 	}
 	else if (c == '\x7f') {
@@ -109,7 +124,7 @@ void console_putc(unsigned char c) {
 	}
 	else {
 		if (backspace_pressed && c == prev_char) {
-			draw_char(row * CHAR_WIDTH + 1, column * CHAR_HEIGHT, c, 255, 255, 255);
+			draw_char(row * CHAR_WIDTH + 2, column * CHAR_HEIGHT, c, 255, 255, 255);
 		}
 		else {
 			draw_block(row * CHAR_WIDTH, column * CHAR_HEIGHT, CHAR_WIDTH, CHAR_HEIGHT, 0, 0, 0);
@@ -120,7 +135,17 @@ void console_putc(unsigned char c) {
 		if (row >= WIDTH / CHAR_WIDTH) {
 			++column;
 			row = 0;
+
+			if (column >= (HEIGHT / CHAR_HEIGHT) - 1) {
+				kmemcpy((void *)framebuffer, (void *)(framebuffer + BYTES_IN_LINE), BYTES_ON_SCREEN - BYTES_IN_LINE);
+				kmemset((void *)(framebuffer + BYTES_ON_SCREEN - BYTES_IN_LINE), '\0', BYTES_IN_LINE);
+				--column;
+			}
+
 		}
 		backspace_pressed = 0;
-	}	
+	}
+
+	while(*serialflags & (1 << 5)) {}
+	*serialport = c;
 }
