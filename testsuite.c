@@ -1,4 +1,5 @@
 #include "kprintf.h"
+#include "disk.h"
 
 const char* decl = 
 "IN CONGRESS, July 4, 1776.\n\n"
@@ -17,49 +18,40 @@ const char* decl =
 "ends, it is the Right of the\t\tPeople\t\tto alter or to abolish it, and to "
 "institute new Government, laying its foundation on such principles and "
 "organizing its powers in such form, as to them shall seem most likely to "
-"effect their Safety and Happiness.\n"
-"\n"
-"Prudence, indeed, will dictate that Governments long established should not "
-"be changed for light and transient causes;and accordingly all experience hath"
-"shewn, that mankind are more disposed to suffer, while evils are sufferable, "
-"than to right themselves by abolishing the forms to which they are "
-"accustomed. But when a long train of abuses and usurpations, pursuing "
-"invariably the same Object evinces a design to reduce them under absolute Despotism, "
-"it is their right, it is their duty, to throw off such Government,  "
-"and to provide new Guards for their future security.\n"
-"   \t--Such has been the patient sufferance of these Colonies; and such is now the "
-"necessity which constrains them to alter their former Systems of Government. "
-"The history of the present King of Great Britain is a history of repeated injuries "
-"and usurpations, all having in direct object the establishment of an absolute Tyranny "
-"over these States. To prove this, let Facts be submitted to a candid world.\n"
-"...\n"
-"In every stage of these Oppressions We have Petitioned for Redress in the most "
-"humble terms: Our repeated Petitions have been answered only by repeated injury. "
-"A Prince whose character is thus marked by every act which may define a Tyrant, "
-"is unfit to be the ruler of a free people.\n"
-"Nor have We been wanting in attentions to our Brittish brethren. We have warned them "
-"from time to time of attempts by their legislature to extend an unwarrantable jurisdiction "
-"over us. We have reminded them of the circumstances of our emigration and settlement "
-"here. We have appealed to their native justice and magnanimity, and we have conjured "
-"them by the ties of our common kindred to disavow these usurpations, which, would "
-"inevitably interrupt our connections and correspondence. They too have been deaf "
-"to the voice of justice and of consanguinity. We m\bmu\bus\bst\bt, therefore, acquiesce in the "
-"necessity, which denounces our Separation, and hold them, as we hold the rest of mankind, "
-"Enemies in War, in Peace Friends.\n"
-"We, therefore, the Representatives of the united States of America, in General Congress, "
-"Assembled, appealing to the Supreme Judge of the world for the rectitude of our intentions, "
-"do, in the Name, and by Authority of the good People of these Colonies, solemnly "
-"publish and declare, That these \tUnited Colonies \t\tare, and of Right ought to be Free and "
-"Independent States; that they are Absolved from all Allegiance to the British Crown, "
-"and that all political connection between them and the State of Great Britain, "
-"is and ought to be totally dissolved; and that as Free and Independent States, "
-"they have full Power to levy War, conclude Peace, contract Alliances, establish Commerce, "
-"and to do all other Acts and Things which Independent States may of right do. "
-"And for the support of this Declaration, with a firm reliance on the protection of "
-"divine Providence, we mutually pledge to each other our Lives, our Fortunes and our sacred Honor.\n"
-"fooby dooby doo...";
+"effect their Safety and Happiness.\n";
 
+char decl2[512];
 void sweet(){
-    kprintf("%s",decl);
-    kprintf("\r%d %d %d %d %d%c%d...",42,43,44,45,46,127,47);
+    int i;
+
+    for(i=0;i<512;++i)
+        decl2[i] = 'A';
+        
+    disk_write_sector( 4, decl+512);
+    disk_write_sector( 2,decl);
+    disk_write_sector( 3,decl2);
+    
+    disk_read_sector( 2, decl2);
+    for(i=0;i<512;++i){
+        if( decl[i] != decl2[i] ){
+            kprintf("Bad\n");
+            return;
+        }
+    }
+    disk_read_sector( 3, decl2);
+    for(i=0;i<512;++i){
+        if( decl2[i] != 'A' ){
+            kprintf("Badder\n");
+            return;
+        }
+    }
+    disk_read_sector( 4, decl2);
+    for(i=0;i<512;++i){
+        if( decl[512+i] != decl2[i] ){
+            kprintf("Baddest\n");
+            return;
+        }
+    }
+            
+    kprintf("Muy bien\n");
 }

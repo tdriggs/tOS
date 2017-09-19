@@ -1,0 +1,8 @@
+write Resource/about.txt about.txt
+write Resource/article1.txt article1.txt
+write Resource/article1.txt article1.txt
+write Resource/Resources/article2.txt article2.txt
+write Resource/article3.txt article3.txt
+write Resource/article4.txt article4.txt
+write Resource/article5.txt article5.txt
+write Resource/article6.txt article6.txt
