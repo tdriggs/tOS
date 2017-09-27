@@ -26,15 +26,12 @@ void disk_init() {
 }
 
 void load_filesystem() {
+	static char blockbuffer[4096];
+
 	disk_read_block(0, blockbuffer);
 	kmemcpy(&sblock, blockbuffer + 1024, sizeof(sblock));
 
-	num_block_groups = 0;
-	int num_blocks = sblock.block_count;
-	while (num_blocks > 0) {
-		num_blocks -= sblock.blocks_per_group;
-		++num_block_groups;
-	}
+	num_block_groups = kdivide(sblock.block_count, sblock.blocks_per_group);
 
 	disk_read_block(1, blockbuffer);
 	kmemcpy(blockGroupDescriptors, blockbuffer, 
@@ -61,10 +58,69 @@ void disk_read_sector(unsigned sector, const void * datablock) {
 }
 
 void disk_read_block(unsigned block, const void * datablock) {
+	disk_read_block_partial(block, datablock, 0, 4096);
+}
+
+void disk_read_block_partial(unsigned block, const void * p, unsigned start, unsigned count) {
+	static char buffer[4096];
 	int i;
 	for (i = 0; i < 8; ++i) {
-		disk_read_sector((block * 8) + i, datablock + (512 * i));
+		disk_read_sector((block * 8) + i, buffer + (512 * i));
 	}
+	kmemcpy((void *)p, buffer + start, count);
+}
+
+void disk_read_inode(unsigned inode_number, struct Inode * inode) {
+	--inode_number;
+	int inode_group_number = kdivide(inode_number, sblock.inodes_per_group);
+	int inode_block_number = sblock.blocks_per_group * inode_group_number + 4;
+	int byte_offset = kmodulo(inode_number, sblock.inodes_per_group) * sizeof(inode);
+	int block_offset = kdivide(byte_offset, 4096);
+	int inode_offset = inode_number % 32;
+
+	disk_read_block_partial(inode_block_number + block_offset, inode, inode_offset * sizeof(struct Inode), sizeof(struct Inode));
+}
+
+void list_directory(int inode_number, int depth) {
+	struct Inode inode;
+	disk_read_inode(inode_number, &inode);
+	
+	static char buffer[4096];
+	disk_read_block(inode.direct[0], buffer);
+	struct DirEntry * dirEntry = (struct DirEntry *)buffer;
+
+	while (dirEntry->rec_len) {
+		disk_read_inode(dirEntry->inode, &inode);
+		int mode = inode.mode >> 12;
+
+		kprintf("Mode: %d", mode);
+
+		if (mode == 4) {
+			if (dirEntry->name_len == 2 && dirEntry->name[0] == '.' && dirEntry->name[1] == '.') {
+				// kprintf("DOTDOT");
+			}
+			else if (dirEntry->name[0] == '.' && dirEntry->name_len == 1) {
+				// kprintf("DOT");
+			} else {
+				// list_directory(dirEntry->inode, depth + 1);
+				// kprintf("RECURSE");
+			}
+		} 
+
+
+		int i;
+		for (i = 0; i < depth; ++i) {
+			kprintf("  ");
+		}
+
+		kprintf("-%.*s\n", dirEntry->name_len, dirEntry->name);
+		dirEntry = (struct DirEntry *)(((char *)dirEntry) + dirEntry->rec_len);	
+	}
+}
+
+void list_root() {
+	kprintf("-/\n");
+	list_directory(2, 1);
 }
 
 void disk_write_sector(unsigned sector, const void * datablock) {

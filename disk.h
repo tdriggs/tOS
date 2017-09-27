@@ -75,11 +75,45 @@ struct BlockGroupDescriptor {
 };
 #pragma pack(pop)
 
-char blockbuffer[4096];
+#pragma pack(push,1)
+struct Inode {
+    unsigned short mode;
+    unsigned short uid;
+    unsigned size;
+    unsigned atime;
+    unsigned ctime;
+    unsigned mtime;
+    unsigned dtime;
+    unsigned short gid;
+    unsigned short links;
+    unsigned blocks;
+    unsigned flags;
+    unsigned osd1;
+    unsigned direct[12];
+    unsigned indirect;
+    unsigned doubleindirect;
+    unsigned tripleindirect;
+    unsigned generation;
+    unsigned fileacl;
+    unsigned diracl;
+    unsigned osd2;
+    char reserved[12];
+}; 
+#pragma pack(pop)
+
+#pragma pack(push,1)
+struct DirEntry {
+    unsigned inode;
+    unsigned short rec_len;
+    unsigned short name_len;
+    char name[1];
+};
+#pragma pack(pop)
 
 struct Superblock sblock;
 int num_block_groups;
 struct BlockGroupDescriptor * blockGroupDescriptors;
+struct DirEntry * rootDirEntries;
 
 int is_busy();
 
@@ -90,5 +124,13 @@ void load_filesystem();
 void disk_read_sector(unsigned sector, const void * datablock);
 
 void disk_read_block(unsigned block, const void * datablock);
+
+void disk_read_inode(unsigned num, struct Inode * inode);
+
+void disk_read_block_partial(unsigned block, const void * p, unsigned start, unsigned count);
+
+void list_directory(int inode_number, int depth);
+
+void list_root();
 
 void disk_write_sector(unsigned sector, const void * datablock);

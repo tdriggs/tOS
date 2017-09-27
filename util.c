@@ -14,3 +14,80 @@ void kmemset(void * p, char v, int n) {
 		*pp++ = v;
 	}
 }
+
+
+// kmemcmp (filename, de->name, de->name_len){
+// 	char * ap = (char*) filename
+// 	"" dename
+// 	while len > 0
+// 		if *ap < * bp
+// 			return -1
+// 		if *ap > *bp 
+// 			return 1
+
+// 	return 0
+// }
+
+// kstrlen (char * s) {
+// 	int n = 0
+// 	while *s++
+// 		n++
+// 	return n
+// }
+
+void panic(const char * msg) {
+	kprintf("%s", msg);
+	while(1);
+}
+
+int kdivide(int n, int d) {
+	int q = 0;
+	while (n - d >= 0) {
+		n -= d;
+		++q;
+	}
+	return q;
+	// int Q = 0;
+	// int TUB = 0;
+
+	// int i;
+	// for (i = 0; i < 32; ++i) {
+	// 	if ((0x80000000 >> i) & n) {
+	// 		TUB |= 1;
+	// 	}
+	// }
+
+	// Q <<= 1;
+	// if (TUB >= d) {
+	// 	Q |= 1;
+	// 	TUB -= d;
+	// }
+
+	// return Q;
+}
+
+int kmodulo(int n, int d) {
+	int q = 0;
+	while (n - d >= 0) {
+		n -= d;
+		++q;
+	}
+	return n;
+	// int Q = 0;
+	// int TUB = 0;
+
+	// int i;
+	// for (i = 0; i < 32; ++i) {
+	// 	if ((0x80000000 >> i) & n) {
+	// 		TUB |= 1;
+	// 	}
+	// }
+
+	// Q <<= 1;
+	// if (TUB >= d) {
+	// 	Q |= 1;
+	// 	TUB -= d;
+	// }
+
+	// return Q;
+}
