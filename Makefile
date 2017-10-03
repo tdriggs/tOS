@@ -25,7 +25,8 @@ all:
 	$(CC) kprintf.c
 	$(CC) util.c
 	$(CC) disk.c
-	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o testsuite.o kprintf.o util.o disk.o
+	$(CC) file.c
+	$(LD) -o kernel.tmp kernelasm.o kernelmain.o console.o testsuite.o kprintf.o util.o disk.o file.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(TRUNCATE) -s 400000000 sdcard.img
 	$(MKE2FS) -b 4096 -F -I 128 -q -t ext2 -r 0 -L moocow -g 32768 sdcard.img

@@ -81,6 +81,15 @@ void disk_read_inode(unsigned inode_number, struct Inode * inode) {
 	disk_read_block_partial(inode_block_number + block_offset, inode, inode_offset * sizeof(struct Inode), sizeof(struct Inode));
 }
 
+void print_file_name(int depth, int name_len, char * fname) {
+	int i;
+	for (i = 0; i < depth; ++i) {
+		kprintf("  ");
+	}
+
+	kprintf("-%.*s\n", name_len, fname);
+}
+
 void list_directory(int inode_number, int depth) {
 	struct Inode inode;
 	disk_read_inode(inode_number, &inode);
@@ -93,27 +102,25 @@ void list_directory(int inode_number, int depth) {
 		disk_read_inode(dirEntry->inode, &inode);
 		int mode = inode.mode >> 12;
 
-		kprintf("Mode: %d", mode);
+		// kprintf("Mode: %d", mode);
+		// kprintf("Depth: %d", depth);
 
 		if (mode == 4) {
 			if (dirEntry->name_len == 2 && dirEntry->name[0] == '.' && dirEntry->name[1] == '.') {
-				// kprintf("DOTDOT");
+				kprintf("  DOTDOT\n");
 			}
-			else if (dirEntry->name[0] == '.' && dirEntry->name_len == 1) {
-				// kprintf("DOT");
-			} else {
+			else if (dirEntry->name_len == 1 && dirEntry->name[0] == '.') {
+				kprintf("  DOT\n");
+			}
+			else {
+				print_file_name(depth, dirEntry->name_len, dirEntry->name);
 				// list_directory(dirEntry->inode, depth + 1);
-				// kprintf("RECURSE");
 			}
-		} 
-
-
-		int i;
-		for (i = 0; i < depth; ++i) {
-			kprintf("  ");
 		}
-
-		kprintf("-%.*s\n", dirEntry->name_len, dirEntry->name);
+		else {
+			print_file_name(depth, dirEntry->name_len, dirEntry->name);
+		}
+		
 		dirEntry = (struct DirEntry *)(((char *)dirEntry) + dirEntry->rec_len);	
 	}
 }

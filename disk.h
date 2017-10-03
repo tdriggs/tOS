@@ -129,6 +129,8 @@ void disk_read_inode(unsigned num, struct Inode * inode);
 
 void disk_read_block_partial(unsigned block, const void * p, unsigned start, unsigned count);
 
+void print_file_name(int depth, int name_len, char * fname);
+
 void list_directory(int inode_number, int depth);
 
 void list_root();
