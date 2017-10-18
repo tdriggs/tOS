@@ -5,3 +5,4 @@
 #define ENOENT -2
 #define EINVAL -3
 #define EPERM -4
+#define ENOFILE -5
