@@ -2,7 +2,7 @@
 #include "font.h"
 #include "util.h"
 
-volatile unsigned char * framebuffer = (unsigned char *)((0x07ffffff - WIDTH * HEIGHT * 2) & 0xfffffff0);
+volatile unsigned char * framebuffer = (unsigned char *)framebuffer_start;
 volatile unsigned * serialport = (unsigned *) 0x16000000;
 volatile unsigned * serialflags = (unsigned *) 0x16000018;
 

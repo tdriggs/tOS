@@ -94,31 +94,27 @@ void list_directory(int inode_number, int depth) {
 	struct Inode inode;
 	disk_read_inode(inode_number, &inode);
 	
-	static char buffer[4096];
+	char buffer[4096];
 	disk_read_block(inode.direct[0], buffer);
 	struct DirEntry * dirEntry = (struct DirEntry *)buffer;
 
-	while (dirEntry->rec_len) {
+	while (dirEntry->rec_len && dirEntry->inode != 0) {
 		disk_read_inode(dirEntry->inode, &inode);
 		int mode = inode.mode >> 12;
 
-		// kprintf("Mode: %d", mode);
-		// kprintf("Depth: %d", depth);
-
-		if (mode == 4) {
-			if (dirEntry->name_len == 2 && dirEntry->name[0] == '.' && dirEntry->name[1] == '.') {
-				kprintf("  DOTDOT\n");
-			}
-			else if (dirEntry->name_len == 1 && dirEntry->name[0] == '.') {
-				kprintf("  DOT\n");
+		if (dirEntry->inode != 0) {
+			if (mode == 4) {
+				if (dirEntry->name[0] == '.') {
+					//kprintf("HIDDEN FILE\n");
+				}
+				else {
+					print_file_name(depth, dirEntry->name_len, dirEntry->name);
+					list_directory(dirEntry->inode, depth + 1);
+				}
 			}
 			else {
 				print_file_name(depth, dirEntry->name_len, dirEntry->name);
-				// list_directory(dirEntry->inode, depth + 1);
 			}
-		}
-		else {
-			print_file_name(depth, dirEntry->name_len, dirEntry->name);
 		}
 		
 		dirEntry = (struct DirEntry *)(((char *)dirEntry) + dirEntry->rec_len);	

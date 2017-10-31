@@ -1,6 +1,8 @@
 #include "console.h"
 #include "disk.h"
+#include "interrupt.h"
 #include "kprintf.h"
+#include "file.h"
 #include "util.h"
 
 void sweet();
@@ -13,8 +15,9 @@ void kernel_main()
 	
 	disk_init();
 	console_init();
+	interrupt_init();
 
-	sweet();
+	file_exec("print.bin");
 
 	while(1) { }
 }

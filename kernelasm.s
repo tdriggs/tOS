@@ -5,7 +5,7 @@
 
 .section .data
 
-.rept 1024
+.rept 8192
 	.word 0
 .endr
 stack:

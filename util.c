@@ -15,7 +15,6 @@ void kmemset(void * p, char v, int n) {
 	}
 }
 
-
 // kmemcmp (filename, de->name, de->name_len){
 // 	char * ap = (char*) filename
 // 	"" dename
@@ -41,53 +40,43 @@ void panic(const char * msg) {
 }
 
 int kdivide(int n, int d) {
-	int q = 0;
-	while (n - d >= 0) {
-		n -= d;
-		++q;
+	int Q = 0;
+	int TUB = 0;
+
+	int i;
+	for (i = 0; i < 32; ++i) {
+		TUB <<= 1;
+		if (n & (0x80000000 >> i)) {
+			TUB |= 1;
+		}
+
+		Q <<= 1;
+		if (TUB >= d) {
+			Q |= 1;
+			TUB -= d;
+		}
 	}
-	return q;
-	// int Q = 0;
-	// int TUB = 0;
 
-	// int i;
-	// for (i = 0; i < 32; ++i) {
-	// 	if ((0x80000000 >> i) & n) {
-	// 		TUB |= 1;
-	// 	}
-	// }
-
-	// Q <<= 1;
-	// if (TUB >= d) {
-	// 	Q |= 1;
-	// 	TUB -= d;
-	// }
-
-	// return Q;
+	return Q;
 }
 
 int kmodulo(int n, int d) {
-	int q = 0;
-	while (n - d >= 0) {
-		n -= d;
-		++q;
+	int Q = 0;
+	int TUB = 0;
+
+	int i;
+	for (i = 0; i < 32; ++i) {
+		TUB <<= 1;
+		if ((0x80000000 >> i) & n) {
+			TUB |= 1;
+		}
+
+		Q <<= 1;
+		if (TUB >= d) {
+			Q |= 1;
+			TUB -= d;
+		}
 	}
-	return n;
-	// int Q = 0;
-	// int TUB = 0;
 
-	// int i;
-	// for (i = 0; i < 32; ++i) {
-	// 	if ((0x80000000 >> i) & n) {
-	// 		TUB |= 1;
-	// 	}
-	// }
-
-	// Q <<= 1;
-	// if (TUB >= d) {
-	// 	Q |= 1;
-	// 	TUB -= d;
-	// }
-
-	// return Q;
+	return TUB;
 }

@@ -6,15 +6,18 @@ write Resource/article3.txt article3.txt
 write Resource/article4.txt article4.txt
 write Resource/article5.txt article5.txt
 write Resource/article6.txt article6.txt
+write flower1.ppm flower1.ppm
+write ripple.ppm ripple.ppm
 mkdir submarine
 cd submarine
-write const.py const.py
-write constitution.txt constitution.txt
+write Resource/const.py const.py
+write Resource/constitution.txt constitution.txt
 mkdir "sub basement"
 cd "sub basement"
-write article1.txt we
-write article2.txt the
+write Resource/article1.txt we
+write Resource/article2.txt the
 cd ..
-write article3.txt people
+write Resource/article3.txt people
 cd ..
-write article4.txt "of the Untied States"
+write Resource/article4.txt "of the Untied States"
+write print.bin print.bin

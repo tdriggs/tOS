@@ -1,3 +1,5 @@
+#pragma once
+
 #define WIDTH 800
 #define HEIGHT 600
 
@@ -10,6 +12,8 @@
 #define baseaddr2   (*(pl110+5))    //offset 20: lower panel base address
 #define intmask     (*(pl110+6))    //offset 24: interrupt mask
 #define params      (*(pl110+7))    //offset 28: panel parameterss
+
+#define framebuffer_start ((0x07ffffff - WIDTH * HEIGHT * 2) & 0xfffffff0)
 
 void console_init();
 

@@ -6,3 +6,4 @@
 #define EINVAL -3
 #define EPERM -4
 #define ENOFILE -5
+#define ENOSYS -6
