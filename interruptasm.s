@@ -73,6 +73,7 @@ handler_dataabort:
     push {r0-r12}
     bl handler_data_c
     pop {r0-r12}
+    pop {lr}
     subs pc,lr,#0
 handler_reserved:
     ldr sp,=res_stack
@@ -81,6 +82,7 @@ handler_reserved:
     push {r0-r12}
     bl handler_res_c
     pop {r0-r12}
+    pop {lr}
     subs pc,lr,#0
 handler_irq:
     ldr sp,=irq_stack
@@ -89,6 +91,7 @@ handler_irq:
     push {r0-r12}
     bl handler_irq_c
     pop {r0-r12}
+    pop {lr}
     subs pc,lr,#0
 handler_fiq:
     ldr sp,=fiq_stack
@@ -97,6 +100,7 @@ handler_fiq:
     push {r0-r12}
     bl handler_fiq_c
     pop {r0-r12}
+    pop {lr}
     subs pc,lr,#0
 
 .section .data

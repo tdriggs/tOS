@@ -15,25 +15,6 @@ void kmemset(void * p, char v, int n) {
 	}
 }
 
-// kmemcmp (filename, de->name, de->name_len){
-// 	char * ap = (char*) filename
-// 	"" dename
-// 	while len > 0
-// 		if *ap < * bp
-// 			return -1
-// 		if *ap > *bp 
-// 			return 1
-
-// 	return 0
-// }
-
-// kstrlen (char * s) {
-// 	int n = 0
-// 	while *s++
-// 		n++
-// 	return n
-// }
-
 void panic(const char * msg) {
 	kprintf("%s", msg);
 	while(1);
@@ -79,4 +60,12 @@ int kmodulo(int n, int d) {
 	}
 
 	return TUB;
+}
+
+void halt() {
+	asm volatile(
+        "mov r0,#0\n"
+        "mcr p15,0,r0,c7,c0,4" 
+        ::: "r0"
+    );
 }

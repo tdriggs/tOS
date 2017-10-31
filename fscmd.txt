@@ -21,3 +21,5 @@ write Resource/article3.txt people
 cd ..
 write Resource/article4.txt "of the Untied States"
 write print.bin print.bin
+write usr_blink.bin usr_blink.bin
+write tickingclock.bin tickingclock.bin

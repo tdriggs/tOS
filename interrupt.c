@@ -4,9 +4,17 @@
 #include "errno.h"
 #include "file.h"
 #include "util.h"
+#include "timer.h"
  
 void interrupt_init(){
     kmemcpy((void*)0, itable_start, itable_end-itable_start);
+
+    asm volatile(
+        "mrs r0,cpsr\n"
+        "and r0,r0,#0xffffff7f\n"
+        "msr cpsr,r0" 
+        ::: "r0" 
+    );
 }
 
 void handler_reset_c(){
@@ -46,6 +54,17 @@ void handler_svc_c(unsigned  * regs)
         {
         	kprintf("%.*s", regs[3], (char*)regs[2]);
         	regs[0] = 1;
+            break;
+        }
+        case SYSCALL_HALT:
+        {
+            halt();
+            break;
+        }
+        case SYSCALL_UPTIME:
+        {
+            regs[0] = timeMilliseconds;
+            break;
         }
         default:
         {
@@ -66,8 +85,11 @@ void handler_res_c(){
     kprintf("RES\n");
 }
 
-void handler_irq_c(){
-    kprintf("IRQ\n");
+void handler_irq_c() {
+    if( *IRQ_STATUS & IRQ_TIMER ){
+        *TIMER_ACK = 1;
+        increment_milliseconds();
+    }
 }
 
 void handler_fiq_c(){

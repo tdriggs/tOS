@@ -3,6 +3,7 @@
 #include "interrupt.h"
 #include "kprintf.h"
 #include "file.h"
+#include "timer.h"
 #include "util.h"
 
 void sweet();
@@ -16,8 +17,10 @@ void kernel_main()
 	disk_init();
 	console_init();
 	interrupt_init();
+	timer_init();
 
-	file_exec("print.bin");
+	//sweet(1, framebuffer_start);
+	file_exec("tickingclock.bin");
 
-	while(1) { }
+	halt();
 }

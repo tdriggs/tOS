@@ -29,15 +29,22 @@ all:
 	$(CC) disk.c
 	$(CC) file.c
 	$(CC) interrupt.c
-	$(LDKERNEL) -o kernel.tmp kernelasm.o interruptasm.o kernelmain.o console.o testsuite.o kprintf.o util.o disk.o file.o interrupt.o
+	$(CC) timer.c
+	$(LDKERNEL) -o kernel.tmp kernelasm.o interruptasm.o kernelmain.o console.o testsuite.o kprintf.o util.o disk.o file.o interrupt.o timer.o
 	$(OBJCOPY) -Obinary kernel.tmp kernel.bin
 	$(TRUNCATE) -s 400000000 sdcard.img
 	$(MKE2FS) -b 4096 -F -I 128 -q -t ext2 -r 0 -L moocow -g 32768 sdcard.img
 	$(AS) crtasm.s
 	$(CC) crtc.c
 	$(CC) print.c
+	$(CC) usr_blink.c
+	$(CC) tickingclock.c
 	$(LDPROGRAM) -o print.tmp print.o
-	$(OBJCOPY) -Obinary print.tmp print.bin
+	$(LDPROGRAM) -o usr_blink.tmp usr_blink.o
+	$(LDPROGRAM) -o tickingclock.tmp tickingclock.o
+	$(OBJCOPY) -Obinary print.tmp print.bin 
+	$(OBJCOPY) -Obinary usr_blink.tmp usr_blink.bin
+	$(OBJCOPY) -Obinary tickingclock.tmp tickingclock.bin
 	$(DEBUGFS) -w -f fscmd.txt sdcard.img
 	"$(QEMU)" $(QEMUARGS) kernel.bin
 	
